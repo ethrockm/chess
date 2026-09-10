@@ -18,6 +18,16 @@ public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     protected ChessPiece buildOriginal() {
         return new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
     }
