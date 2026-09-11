@@ -40,4 +40,14 @@ public class ChessBoard {
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
     }
+
+    /**
+     *
+     * @param target
+     * @param teamColor
+     * @return
+     */
+    public boolean isValidMove(ChessPosition target, ChessGame.TeamColor teamColor) {
+        return true;
+    }
 }
