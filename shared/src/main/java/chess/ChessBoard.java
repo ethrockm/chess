@@ -48,6 +48,12 @@ public class ChessBoard {
      * @return
      */
     public boolean isValidMove(ChessPosition target, ChessGame.TeamColor teamColor) {
+        if (target.col > 7|| target.col < 0){
+            return false;
+        }
+        if (target.row > 7|| target.row < 0){
+            return false;
+        }
         return true;
     }
 }

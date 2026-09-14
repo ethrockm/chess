@@ -19,7 +19,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        throw new RuntimeException("Not implemented");
+        return row;
     }
 
     /**
@@ -27,10 +27,34 @@ public class ChessPosition {
      * 1 codes for the left column
      */
     public int getColumn() {
-        throw new RuntimeException("Not implemented");
+        return col;
     }
 
-    public ChessPosition addOffset(int i, int i1) {
-        return new ChessPosition(col+i, row+i1);
+    public ChessPosition addOffset(int c, int r) {
+        return new ChessPosition(col+c, row+r);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null){
+            return false;
+        }
+        if(obj == this){
+            return true;
+        }
+        if(obj.getClass() != this.getClass()){
+            return false;
+        }
+        ChessPosition p = (ChessPosition)obj;
+        if(this.col == p.col && this.row == p.row){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 9 * col + row;
     }
 }
