@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Arrays;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -7,9 +9,9 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-
+    ChessPiece[][] boardArray;
     public ChessBoard() {
-        
+        this.boardArray = new ChessPiece[8][8];
     }
 
     /**
@@ -19,7 +21,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        boardArray[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -30,7 +32,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return boardArray[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -38,7 +40,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        boardArray[0][0] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
     }
 
     /**
@@ -55,5 +57,65 @@ public class ChessBoard {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if(obj == this){
+            return true;
+        }
+        if(obj.getClass() != this.getClass()){
+            return false;
+        }
+
+        ChessBoard p = (ChessBoard) obj;
+        if(this.boardArray.length != p.boardArray.length){
+            return false;
+        }
+        if(this.boardArray == null || p.boardArray == null){
+            return false;
+        }
+
+        for(int i = 0; i < this.boardArray.length; i++){
+            ChessPiece[] thisRow = this.boardArray[i];
+            ChessPiece[] pRow = p.boardArray[i];
+            if(thisRow == pRow){
+                continue;
+            }
+            if(thisRow == null || pRow == null){
+                return false;
+            }
+            if(thisRow.length != pRow.length){
+                return false;
+            }
+            for(int j = 0; j< thisRow.length; j++) {
+                if (thisRow[j] != pRow[j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        if(this.boardArray == null){
+            return 0;
+        }
+        for (int i = 0; i < this.boardArray.length; i++){
+            ChessPiece[] row = this.boardArray[i];
+            int rowHash = 1;
+            if(row != null){
+                for(int j = 0; j < row.length; j++){
+                    if(row[j] != null){
+                        rowHash = 24 * rowHash + row[j].hashCode();
+                    }
+                }
+            }
+            hash = 9 * hash + rowHash;
+        }
+        return hash;
     }
 }
