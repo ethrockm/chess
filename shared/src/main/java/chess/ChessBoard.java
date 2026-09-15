@@ -110,7 +110,7 @@ public class ChessBoard {
             if(row != null){
                 for(int j = 0; j < row.length; j++){
                     if(row[j] != null){
-                        rowHash = 24 * rowHash + row[j].hashCode();
+                        rowHash = 24 * rowHash + (row[j].hashCode() * 5);
                     }
                 }
             }
