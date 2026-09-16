@@ -70,4 +70,13 @@ public class ChessMove {
         }
         return start.hashCode()*end.hashCode()*promotion.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "ChessMove{" +
+                "start=" + start +
+                ", end=" + end +
+                ", promotion=" + promotion +
+                '}';
+    }
 }
