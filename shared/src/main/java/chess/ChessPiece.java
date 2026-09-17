@@ -57,8 +57,20 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
+        if(myPosition.row > 8 || myPosition.row < 1 || myPosition.col > 8 || myPosition.col < 1){
+            return moves;
+        }
         if(type == PieceType.KING){
             int[][] offsets = { {1, 1}, {1, -1}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}, {1, 0}, {-1, 0} };
+            for (int[] offset : offsets) {
+                ChessPosition target = myPosition.addOffset(offset[0], offset[1]);
+                if (board.isValidMove(target, this.getTeamColor())) {
+                    moves.add(new ChessMove(myPosition, target, null));
+                }
+            }
+        }
+        if(type == PieceType.KNIGHT){
+            int[][] offsets = { {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1} };
             for (int[] offset : offsets) {
                 ChessPosition target = myPosition.addOffset(offset[0], offset[1]);
                 if (board.isValidMove(target, this.getTeamColor())) {

@@ -30,8 +30,8 @@ public class ChessPosition {
         return col;
     }
 
-    public ChessPosition addOffset(int c, int r) {
-        return new ChessPosition(col+c, row+r);
+    public ChessPosition addOffset(int r, int c) {
+        return new ChessPosition(row+c, col+r);
     }
 
     @Override
@@ -56,5 +56,10 @@ public class ChessPosition {
     public int hashCode() {
 
         return 9 * col + row;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%d,%d]", row, col);
     }
 }
