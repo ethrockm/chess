@@ -99,6 +99,20 @@ public class ChessBoard {
         return false;
     }
 
+    public boolean isValidCapture(ChessPosition target, ChessGame.TeamColor teamColor) {
+        if (target.col > 8|| target.col < 1){
+            return false;
+        }
+        if (target.row > 8|| target.row < 1){
+            return false;
+        }
+        if (getPiece(target).getTeamColor() != teamColor){
+            return true;
+        }
+        return false;
+    }
+
+
     @Override
     public boolean equals(Object obj) {
 
