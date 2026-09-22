@@ -46,7 +46,7 @@ TeamColor turn;
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece moves = new ChessPiece(getBoard().getPiece(startPosition).pieceColor,getBoard().getPiece(startPosition).type);
+        ChessPiece moves = new ChessPiece(getBoard().getPiece(startPosition).color,getBoard().getPiece(startPosition).type);
         return moves.pieceMoves(getBoard(),startPosition);
     }
 

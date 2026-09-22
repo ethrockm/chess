@@ -12,24 +12,25 @@ public class ChessMove {
     ChessPosition start;
     ChessPosition end;
     ChessPiece.PieceType promotion;
-    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
-        this.start = startPosition;
-        this.end = endPosition;
-        this.promotion = promotionPiece;
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
+                     ChessPiece.PieceType promotionPiece) {
+        start = startPosition;
+        end = endPosition;
+        promotion = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        return this.start;
+        return start;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        return this.end;
+        return end;
     }
 
     /**
@@ -43,40 +44,24 @@ public class ChessMove {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(obj == null){
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if(obj == this){
-            return true;
-        }
-        if(obj.getClass() != this.getClass()){
-            return false;
-        }
-        ChessMove p = (ChessMove)obj;
-        if(this.start == p.start && this.end == p.end){
-            return true;
-        }
-        if(Objects.equals(this.start,p.start) && Objects.equals(this.end,p.end) && Objects.equals(this.promotion,p.promotion)){
-            return true;
-        }
-        return false;
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(start, chessMove.start) && Objects.equals(end, chessMove.end) && promotion == chessMove.promotion;
     }
 
     @Override
     public int hashCode() {
-        if(this.promotion == null){
-            return start.hashCode()*(end.hashCode()+23);
-        }
-        return start.hashCode()*end.hashCode()*promotion.hashCode();
+        return Objects.hash(start, end, promotion);
     }
 
     @Override
     public String toString() {
-        return "ChessMove{" +
-                "start=" + start +
-                ", end=" + end +
-                ", promotion=" + promotion +
-                '}';
+        return
+                "[" + start +
+                        "," + end +
+                        ']';
     }
 }
