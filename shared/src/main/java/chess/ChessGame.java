@@ -57,7 +57,9 @@ TeamColor turn;
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        //if(!isInCheck() && !isInCheckmate())
+        getBoard().addPiece(move.getEndPosition(),getBoard().getPiece(move.getStartPosition()));
+        //throw new InvalidMoveException("Invalid Move");
     }
 
     /**
@@ -97,7 +99,7 @@ TeamColor turn;
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+
     }
 
     /**
