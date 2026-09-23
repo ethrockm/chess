@@ -73,7 +73,28 @@ ChessBoard board;
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return true;
+        ChessPosition king;
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                if(board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    king = new ChessPosition(i,j);
+                    for(int i1 = 1; i1 <= 8; i1++){
+                        for(int j1 = 1; j1 <= 8; j1++){
+                            if(board.getPiece(new ChessPosition(i1,j1)) != null) {
+                                for (ChessMove moves : board.getPiece(new ChessPosition(i1, j1)).pieceMoves(board, new ChessPosition(i1, j1))) {
+                                    if (moves.getEndPosition() == king) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+        }
+        return false;
     }
 
     /**
