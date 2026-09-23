@@ -61,7 +61,7 @@ ChessBoard board;
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //if(!isInCheck() && !isInCheckmate())
-        getBoard().addPiece(move.getEndPosition(),getBoard().getPiece(move.getStartPosition()));
+        board.addPiece(move.getEndPosition(),board.getPiece(move.getStartPosition()));
         //throw new InvalidMoveException("Invalid Move");
     }
 
