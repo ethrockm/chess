@@ -10,8 +10,11 @@ import java.util.Collection;
  */
 public class ChessGame {
 TeamColor turn;
+ChessBoard board;
     public ChessGame() {
         turn = TeamColor.WHITE;
+        board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -69,7 +72,7 @@ TeamColor turn;
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return true;
     }
 
     /**
@@ -99,7 +102,7 @@ TeamColor turn;
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-
+        this.board = board;
     }
 
     /**
@@ -108,6 +111,6 @@ TeamColor turn;
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
