@@ -134,6 +134,24 @@ ChessBoard board;
                 }
             }
         }
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                if(board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    for (ChessMove moves : board.getPiece(new ChessPosition(i, j)).pieceMoves(board, new ChessPosition(i, j))) {
+                        ChessPiece targetPiece = board.getPiece(new ChessPosition(moves.getEndPosition().getRow(),moves.getEndPosition().getColumn()));
+                        board.addPiece(new ChessPosition(moves.getEndPosition().getRow(),moves.getEndPosition().getColumn()),board.getPiece(new ChessPosition(i,j)));
+                        board.addPiece(new ChessPosition(moves.getStartPosition().getRow(),moves.getStartPosition().getColumn()),null);
+                        boolean stillInCheck = isInCheck(teamColor);
+                        board.addPiece(new ChessPosition(moves.getStartPosition().getRow(),moves.getStartPosition().getColumn()),board.getPiece(new ChessPosition(moves.getEndPosition().getRow(),moves.getEndPosition().getColumn())));
+                        board.addPiece(new ChessPosition(moves.getEndPosition().getRow(),moves.getEndPosition().getColumn()),targetPiece);
+                        if(!stillInCheck){
+                            return false;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
         if(moveCount == 0){
             return true;
         }
