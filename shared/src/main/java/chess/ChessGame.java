@@ -63,6 +63,13 @@ ChessBoard board;
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //if(!isInCheck() && !isInCheckmate())
         board.addPiece(move.getEndPosition(),board.getPiece(move.getStartPosition()));
+        board.addPiece(move.getStartPosition(),null);
+        if(getTeamTurn() == TeamColor.WHITE){
+            setTeamTurn(TeamColor.BLACK);
+        }
+        else {
+            setTeamTurn(TeamColor.WHITE);
+        }
         //throw new InvalidMoveException("Invalid Move");
     }
 
