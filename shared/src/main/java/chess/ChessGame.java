@@ -82,7 +82,7 @@ ChessBoard board;
                         for(int j1 = 1; j1 <= 8; j1++){
                             if(board.getPiece(new ChessPosition(i1,j1)) != null) {
                                 for (ChessMove moves : board.getPiece(new ChessPosition(i1, j1)).pieceMoves(board, new ChessPosition(i1, j1))) {
-                                    if (moves.getEndPosition() == king) {
+                                    if (moves.getEndPosition().equals(king)) {
                                         return true;
                                     }
                                 }
@@ -92,7 +92,6 @@ ChessBoard board;
                     break;
                 }
             }
-
         }
         return false;
     }
@@ -104,7 +103,41 @@ ChessBoard board;
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(!isInCheck(teamColor)){
+            return false;
+        }
+        ChessPosition king = null;
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                if(board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    king = new ChessPosition(i,j);
+                    
+                }
+            }
+        }
+        if(king == null){
+            return false;
+        }
+        int moveCount = board.getPiece(king).pieceMoves(board, king).size();
+        for(ChessMove kingMoves : board.getPiece(king).pieceMoves(board, king)){
+            outerLoop:
+            for (int i1 = 1; i1 <= 8; i1++) {
+                for (int j1 = 1; j1 <= 8; j1++) {
+                    if (board.getPiece(new ChessPosition(i1, j1)) != null) {
+                        for (ChessMove moves : board.getPiece(new ChessPosition(i1, j1)).pieceMoves(board, new ChessPosition(i1, j1))) {
+                            if (moves.getEndPosition().equals(kingMoves.getEndPosition())) {
+                                moveCount = moveCount - 1;
+                                break outerLoop;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(moveCount == 0){
+            return true;
+        }
+        return false;
     }
 
     /**
