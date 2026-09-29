@@ -51,6 +51,9 @@ ChessBoard board;
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece moves = new ChessPiece(getBoard().getPiece(startPosition).color,getBoard().getPiece(startPosition).type);
+        if(board.getPiece(startPosition) == null){
+            return null;
+        }
         return moves.pieceMoves(getBoard(),startPosition);
     }
 
@@ -62,6 +65,9 @@ ChessBoard board;
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //if(!isInCheck() && !isInCheckmate())
+        if(board.getPiece(move.getStartPosition()).getTeamColor() != turn){
+            throw new InvalidMoveException("Invalid Move");
+        }
         board.addPiece(move.getEndPosition(),board.getPiece(move.getStartPosition()));
         board.addPiece(move.getStartPosition(),null);
         if(getTeamTurn() == TeamColor.WHITE){
