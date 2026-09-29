@@ -148,7 +148,50 @@ ChessBoard board;
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(isInCheck(teamColor)){
+            return false;
+        }
+
+        ChessPosition king = null;
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                if(board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    king = new ChessPosition(i,j);
+                }
+            }
+        }
+        if(king == null){
+            return false;
+        }
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                if(board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    if(board.getPiece(new ChessPosition(i,j)).pieceMoves(board, new ChessPosition(i,j)) != null && !new ChessPosition(i, j).equals(king)){
+                        return false;
+                    }
+                }
+            }
+        }
+        int moveCountKing = board.getPiece(king).pieceMoves(board, king).size();
+        for(ChessMove kingMoves : board.getPiece(king).pieceMoves(board, king)){
+            outerLoop:
+            for (int i1 = 1; i1 <= 8; i1++) {
+                for (int j1 = 1; j1 <= 8; j1++) {
+                    if (board.getPiece(new ChessPosition(i1, j1)) != null) {
+                        for (ChessMove moves : board.getPiece(new ChessPosition(i1, j1)).pieceMoves(board, new ChessPosition(i1, j1))) {
+                            if (moves.getEndPosition().equals(kingMoves.getEndPosition())) {
+                                moveCountKing = moveCountKing - 1;
+                                break outerLoop;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(moveCountKing == 0){
+            return true;
+        }
+        return false;
     }
 
     /**
