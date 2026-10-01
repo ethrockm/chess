@@ -51,29 +51,32 @@ ChessBoard board;
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMove = List.of();
+        Collection<ChessMove> validMove = new java.util.ArrayList<>(List.of());
         if (getBoard().getPiece(startPosition) == null) {
             return null;
         }
-
         ChessPiece piece = new ChessPiece(getBoard().getPiece(startPosition).getTeamColor(), getBoard().getPiece(startPosition).getPieceType());
         if (isInCheck(getBoard().getPiece(startPosition).getTeamColor())) {
-            for (ChessMove moves : piece.pieceMoves(board, startPosition)) {
-                ChessPiece targetPiece = board.getPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()));
-                board.addPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()), piece);
-                board.addPiece(new ChessPosition(moves.getStartPosition().getRow(), moves.getStartPosition().getColumn()), null);
-                boolean stillInCheck = isInCheck(getBoard().getPiece(startPosition).getTeamColor());
-                board.addPiece(new ChessPosition(moves.getStartPosition().getRow(), moves.getStartPosition().getColumn()), board.getPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn())));
-                board.addPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()), targetPiece);
-                if (!stillInCheck) {
-                    validMove.add(moves);
-                }
-            }
+            isMoveInCheck(startPosition, validMove, piece);
         }
         else {
-            //validMove.addAll(piece.pieceMoves(getBoard(),startPosition));
+            isMoveInCheck(startPosition, validMove, piece);
         }
         return validMove;
+    }
+
+    private void isMoveInCheck(ChessPosition startPosition, Collection<ChessMove> validMove, ChessPiece piece) {
+        for (ChessMove moves : piece.pieceMoves(board, startPosition)) {
+            ChessPiece targetPiece = board.getPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()));
+            board.addPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()), piece);
+            board.addPiece(new ChessPosition(moves.getStartPosition().getRow(), moves.getStartPosition().getColumn()), null);
+            boolean stillInCheck = isInCheck(getBoard().getPiece(moves.getEndPosition()).getTeamColor());
+            board.addPiece(new ChessPosition(moves.getStartPosition().getRow(), moves.getStartPosition().getColumn()), board.getPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn())));
+            board.addPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()), targetPiece);
+            if (!stillInCheck) {
+                validMove.add(moves);
+            }
+        }
     }
 
     /**
