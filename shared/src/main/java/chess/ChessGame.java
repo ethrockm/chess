@@ -86,18 +86,46 @@ ChessBoard board;
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        //if(!isInCheck() && !isInCheckmate())
         if(board.getPiece(move.getStartPosition()) == null){
             throw new InvalidMoveException("Invalid Move");
         }
-
+        if(isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())){
+            for (ChessMove moves : board.getPiece(move.getStartPosition()).pieceMoves(board, move.getStartPosition())) {
+                ChessPiece targetPiece = board.getPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()));
+                board.addPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()), board.getPiece(move.getStartPosition()));
+                board.addPiece(new ChessPosition(moves.getStartPosition().getRow(), moves.getStartPosition().getColumn()), null);
+                boolean stillInCheck = isInCheck(getBoard().getPiece(moves.getEndPosition()).getTeamColor());
+                board.addPiece(new ChessPosition(moves.getStartPosition().getRow(), moves.getStartPosition().getColumn()), board.getPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn())));
+                board.addPiece(new ChessPosition(moves.getEndPosition().getRow(), moves.getEndPosition().getColumn()), targetPiece);
+                if (stillInCheck) {
+                    throw new InvalidMoveException("Invalid Move");
+                }
+            }
+        }
+        boolean goodMove = true;
+        for (ChessMove moves : board.getPiece(move.getStartPosition()).pieceMoves(board, move.getStartPosition())) {
+            if(move.equals(moves)){
+                goodMove = false;
+                break;
+            }
+        }
+        if(goodMove){
+            throw new InvalidMoveException("Invalid Move");
+        }
         if(board.getPiece(move.getStartPosition()).getTeamColor() != turn){
             throw new InvalidMoveException("Invalid Move");
         }
         if((board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getEndPosition()).getTeamColor() == turn)){
             throw new InvalidMoveException("Invalid Move");
         }
-        board.addPiece(move.getEndPosition(),board.getPiece(move.getStartPosition()));
+
+        if(board.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null){
+            board.addPiece(move.getEndPosition(),new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),move.getPromotionPiece()));
+        }
+        else {
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+        }
+
         board.addPiece(move.getStartPosition(),null);
         if(getTeamTurn() == TeamColor.WHITE){
             setTeamTurn(TeamColor.BLACK);
@@ -105,7 +133,6 @@ ChessBoard board;
         else {
             setTeamTurn(TeamColor.WHITE);
         }
-        //throw new InvalidMoveException("Invalid Move");
     }
 
     /**
