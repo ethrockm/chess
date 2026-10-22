@@ -1,0 +1,37 @@
+package service;
+
+import dataaccess.DataAccessException;
+import dataaccess.UserDAO;
+import model.UserData;
+
+public class UserService {
+    private UserDAO userDAO;
+
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+        //If not all fields are filled, then throw exception
+        if(request.username() == null || request.email() == null || request.password() == null){
+            throw new DataAccessException("Missing Required Fields");
+        }
+        //If username already taken, the throw exception
+        if(UserDAO.getUser(request.username()) != null){
+            throw new DataAccessException("Username Taken");
+        }
+        // Create the User
+        UserData newUser = new UserData(request.username(),request.password(),request.email());
+        userDAO.createUser(newUser);
+        //Get an AuthToken
+        String authToken = "Change this";
+        //Return the RegisterResult
+        return new RegisterResult(newUser.username(),authToken);
+    }
+
+    public record RegisterRequest(String username, String password, String email) {
+    }
+
+    public record RegisterResult(String username, String authToken) {
+    }
+}
