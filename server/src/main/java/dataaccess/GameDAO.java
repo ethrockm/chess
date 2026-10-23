@@ -20,4 +20,8 @@ public class GameDAO {
 
     }
 
+    public void clearGames(){
+
+    }
+
 }

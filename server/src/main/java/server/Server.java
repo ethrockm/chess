@@ -3,10 +3,12 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.UserData;
 import dataaccess.UserDAO;
+import service.ClearService;
 import service.UserService;
 
 import java.util.Map;
@@ -21,9 +23,12 @@ public class Server {
         // Initialize DAO and Service
         UserDAO userDAO = new UserDAO();
         AuthDAO authDAO = new AuthDAO();
+        GameDAO gameDAO = new GameDAO();
+        ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
         this.userService = new UserService(userDAO);
         // Register endpoints and exception handlers
         javalin.post("/user", this::registerHandler);
+        javalin.delete("/db", this::clearHandler);
     }
 
     private void registerHandler(Context ctx){
@@ -37,8 +42,17 @@ public class Server {
             } else if(e.getMessage().equals("Error: already taken")){
                 ctx.status(403).result(gson.toJson(Map.of("message", e.getMessage())));
             } else {
-                ctx.status(500).result(gson.toJson(Map.of("message", "Error: (description of error? Not sure what to put here)")));
+                ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
             }
+        }
+    }
+
+    private void clearHandler(Context ctx){
+        try{
+            ClearService.clear();
+            ctx.status(200).result(gson.toJson(Map.of()));
+        } catch (DataAccessException e){
+            ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
         }
     }
 
