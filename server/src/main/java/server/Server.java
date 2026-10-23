@@ -25,10 +25,11 @@ public class Server {
         AuthDAO authDAO = new AuthDAO();
         GameDAO gameDAO = new GameDAO();
         ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
-        this.userService = new UserService(userDAO);
+        this.userService = new UserService(userDAO,authDAO);
         // Register endpoints and exception handlers
         javalin.post("/user", this::registerHandler);
         javalin.post("/session", this::loginHandler);
+        javalin.delete("/session", this::logoutHandler);
         javalin.delete("/db", this::clearHandler);
     }
 
@@ -66,6 +67,20 @@ public class Server {
             if(e.getMessage().equals("Error: bad request")){
                 ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
             } else if(e.getMessage().equals("Error: unauthorized")){
+                ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else {
+                ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
+            }
+        }
+    }
+
+    private void logoutHandler(Context ctx){
+        try{
+            String authToken = ctx.header("authorization");
+            userService.logout(authToken);
+            ctx.status(200).result("{}");
+        } catch (DataAccessException e){
+            if(e.getMessage().equals("Error: unauthorized")){
                 ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
             } else {
                 ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));

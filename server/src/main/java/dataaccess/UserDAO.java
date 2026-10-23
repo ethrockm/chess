@@ -12,7 +12,6 @@ public class UserDAO {
     public static UserData getUser(String username) throws DataAccessException{
         return users.get(username);
     }
-
     public void clearUsers() throws DataAccessException{
         users.clear();
     }

@@ -11,7 +11,7 @@ public class AuthDAO {
     public static AuthData createAuth(String username) throws DataAccessException{
         String token = generateToken();
         AuthData authData = new AuthData(token,username);
-        auths.put(username, authData);
+        auths.put(token, authData);
         return authData;
     }
 
@@ -19,7 +19,7 @@ public class AuthDAO {
         return auths.get(username);
     }
 
-    public void deleteAuth(String username) throws DataAccessException{
+    public static void deleteAuth(String username) throws DataAccessException{
         auths.remove(username);
     }
 

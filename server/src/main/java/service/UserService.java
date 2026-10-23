@@ -12,9 +12,11 @@ import static dataaccess.UserDAO.getUser;
 
 public class UserService {
     private UserDAO userDAO;
+    private AuthDAO authDAO;
 
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
+        this.authDAO = authDAO;
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
@@ -57,5 +59,19 @@ public class UserService {
     }
 
     public record LoginResult(String username, String authToken){
+    }
+
+    public void logout(String authToken) throws DataAccessException {
+        AuthData authData = authDAO.getAuth(authToken);
+        if(authData == null){
+            throw new DataAccessException("Error: unauthorized"); //Missing field info
+        }
+        AuthDAO.deleteAuth(authToken);
+    }
+
+    public record LogoutRequest(String username){}
+
+    public record LogoutResult(String username) {
+
     }
 }
