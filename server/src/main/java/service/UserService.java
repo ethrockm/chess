@@ -45,7 +45,6 @@ public class UserService {
         if(request.username() == null || request.username().isEmpty() || request.password() == null || request.password().isEmpty()){
             throw new DataAccessException("Error: bad request"); //Missing field info
         }
-
         if(getUser(request.username) == null || !Objects.equals(getUser(request.username()).password(), request.password())){
             throw new DataAccessException("Error: unauthorized"); //Wrong password
         }
