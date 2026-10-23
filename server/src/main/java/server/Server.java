@@ -28,6 +28,7 @@ public class Server {
         this.userService = new UserService(userDAO);
         // Register endpoints and exception handlers
         javalin.post("/user", this::registerHandler);
+        javalin.post("/session", this::loginHandler);
         javalin.delete("/db", this::clearHandler);
     }
 
@@ -53,6 +54,22 @@ public class Server {
             ctx.status(200).result(gson.toJson(Map.of()));
         } catch (DataAccessException e){
             ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
+        }
+    }
+
+    private void loginHandler(Context ctx){
+        try{
+            UserService.LoginRequest request = gson.fromJson(ctx.body(), UserService.LoginRequest.class);
+            UserService.LoginResult result = userService.login(request);
+            ctx.status(200).result(gson.toJson(result));
+        } catch (DataAccessException e){
+            if(e.getMessage().equals("Error: bad request")){
+                ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else if(e.getMessage().equals("Error: unauthorized")){
+                ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else {
+                ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
+            }
         }
     }
 
