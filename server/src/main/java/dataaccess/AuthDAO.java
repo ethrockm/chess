@@ -1,20 +1,30 @@
 package dataaccess;
 
 import model.AuthData;
+
+import java.util.HashMap;
 import java.util.UUID;
 
 public class AuthDAO {
-    String token;
-    void createAuth(){
-        token = generateToken();
+    private static final HashMap<String, AuthData> auths = new HashMap<>();
+
+    public static AuthData createAuth(String username) throws DataAccessException{
+        String token = generateToken();
+        AuthData authData = new AuthData(token,username);
+        auths.put(username, authData);
+        return authData;
     }
 
-    AuthData getAuth(String username){
-        return new AuthData(username, token);
+    public AuthData getAuth(String username) throws DataAccessException {
+        return auths.get(username);
     }
 
-    void deleteAuth(){
-        token = null;
+    public void deleteAuth(String username) throws DataAccessException{
+        auths.remove(username);
+    }
+
+    public void clear() throws DataAccessException{
+        auths.clear();
     }
 
     public static String generateToken() {

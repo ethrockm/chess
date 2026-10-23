@@ -2,7 +2,9 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
+import model.AuthData;
 import model.UserData;
+import dataaccess.AuthDAO;
 
 public class UserService {
     private UserDAO userDAO;
@@ -24,9 +26,9 @@ public class UserService {
         UserData newUser = new UserData(request.username(),request.password(),request.email());
         userDAO.createUser(newUser);
         //Get an AuthToken
-        String authToken = "Change this";
+        AuthData authTokens = AuthDAO.createAuth(newUser.username());
         //Return the RegisterResult
-        return new RegisterResult(newUser.username(),authToken);
+        return new RegisterResult(newUser.username(),authTokens.authToken());
     }
 
     public record RegisterRequest(String username, String password, String email) {

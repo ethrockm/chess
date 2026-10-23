@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -19,6 +20,7 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Initialize DAO and Service
         UserDAO userDAO = new UserDAO();
+        AuthDAO authDAO = new AuthDAO();
         this.userService = new UserService(userDAO);
         // Register endpoints and exception handlers
         javalin.post("/user", this::registerHandler);
