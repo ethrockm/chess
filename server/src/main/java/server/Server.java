@@ -1,11 +1,14 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.UserData;
 import dataaccess.UserDAO;
 import service.UserService;
+
+import java.util.Map;
 
 public class Server {
     private final UserService userService;
@@ -22,7 +25,19 @@ public class Server {
     }
 
     private void registerHandler(Context ctx){
-        //do exceptions here
+        try {
+            UserService.RegisterRequest request = gson.fromJson(ctx.body(), UserService.RegisterRequest.class);
+            UserService.RegisterResult result = userService.register(request);
+            ctx.status(200).result(gson.toJson(result));
+        } catch (DataAccessException e) {
+            if(e.getMessage().equals("Error: bad request")){
+                ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else if(e.getMessage().equals("Error: already taken")){
+                ctx.status(403).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else {
+                ctx.status(500).result(gson.toJson(Map.of("message", "Error: (description of error? Not sure what to put here)")));
+            }
+        }
     }
 
     public int run(int desiredPort) {

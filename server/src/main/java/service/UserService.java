@@ -13,12 +13,12 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
         //If not all fields are filled, then throw exception
-        if(request.username() == null || request.email() == null || request.password() == null){
-            throw new DataAccessException("Missing Required Fields");
+        if(request.username() == null || request.username().isEmpty() || request.email() == null || request.email().isEmpty() || request.password() == null || request.password().isEmpty()){
+            throw new DataAccessException("Error: bad request"); //Missing field info
         }
         //If username already taken, the throw exception
         if(UserDAO.getUser(request.username()) != null){
-            throw new DataAccessException("Username Taken");
+            throw new DataAccessException("Error: already taken");
         }
         // Create the User
         UserData newUser = new UserData(request.username(),request.password(),request.email());
