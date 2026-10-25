@@ -6,19 +6,21 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
-import model.UserData;
 import dataaccess.UserDAO;
 import service.ClearService;
+import service.GameService;
 import service.UserService;
 
 import java.util.Map;
 
 public class Server {
     private final UserService userService;
+    private final GameService gameService;
     private final Gson gson = new Gson();
     private final Javalin javalin;
 
     public Server() {
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Initialize DAO and Service
         UserDAO userDAO = new UserDAO();
@@ -26,11 +28,30 @@ public class Server {
         GameDAO gameDAO = new GameDAO();
         ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
         this.userService = new UserService(userDAO,authDAO);
+        this.gameService = new GameService(gameDAO,authDAO);
         // Register endpoints and exception handlers
         javalin.post("/user", this::registerHandler);
         javalin.post("/session", this::loginHandler);
         javalin.delete("/session", this::logoutHandler);
         javalin.delete("/db", this::clearHandler);
+        javalin.post("/game", this::createGameHandler);
+    }
+
+    private void createGameHandler(Context ctx){
+        try {
+            String authToken = ctx.header("authorization");
+            GameService.CreateGameRequest request = gson.fromJson(ctx.body(), GameService.CreateGameRequest.class);
+            GameService.CreateGameResult result = gameService.createGame(request,authToken);
+            ctx.status(200).result(gson.toJson(result));
+        } catch (DataAccessException e) {
+            if(e.getMessage().equals("Error: bad request")){
+                ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else if(e.getMessage().equals("Error: unauthorized")){
+                ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
+            } else {
+                ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
+            }
+        }
     }
 
     private void registerHandler(Context ctx){

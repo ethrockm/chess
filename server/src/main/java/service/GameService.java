@@ -32,23 +32,21 @@ public class GameService {
 
     }
 
-    CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
-        //If not all fields are filled, then throw exception
-        if(request.ID() == 0 || request.wUsername().isEmpty() || request.bUsername().isEmpty() || request.gameName().isEmpty() || request.chessGame() == null){
-            throw new DataAccessException("Error: bad request"); //Missing field info
-        }
-        //If username already taken, the throw exception
-        AuthData authData = authDAO.getAuth(authToken);
-        if(authData == null){
+    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
+        if(authDAO.getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized"); //Missing field info
         }
+        //If not all fields are filled, then throw exception
+        if(request.gameName().isEmpty()){
+            throw new DataAccessException("Error: bad request"); //Missing field info
+        }
         // Create the User
-        GameData newGame = new GameData(request.ID(),request.wUsername(),request.bUsername(),request.gameName(),request.chessGame());
+        GameData newGame = new GameData(0,null,null,request.gameName(),new ChessGame());
         GameDAO.createGame(newGame);
         return new CreateGameResult(newGame.GameID());
     }
 
-    public record CreateGameRequest(int ID, String wUsername, String bUsername, String gameName, ChessGame chessGame){}
+    public record CreateGameRequest(String gameName){}
 
     public record CreateGameResult(int ID){}
 
