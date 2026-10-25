@@ -14,7 +14,7 @@ public class GameDAO {
         games.put(game.gameName(), game);
     }
 
-    public static GameData getGame(String gameName){
+    public static GameData getGame(String gameName) throws DataAccessException{
         return games.get(gameName);
     }
 

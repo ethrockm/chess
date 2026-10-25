@@ -11,6 +11,7 @@ import model.UserData;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dataaccess.GameDAO.getGame;
 import static dataaccess.UserDAO.getUser;
 
 
@@ -37,7 +38,7 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized"); //Missing field info
         }
         //If not all fields are filled, then throw exception
-        if(request.gameName().isEmpty()){
+        if(request.gameName().isEmpty() || getGame(request.gameName()) != null){
             throw new DataAccessException("Error: bad request"); //Missing field info
         }
         // Create the User
