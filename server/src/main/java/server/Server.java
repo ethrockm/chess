@@ -26,7 +26,7 @@ public class Server {
         UserDAO userDAO = new UserDAO();
         AuthDAO authDAO = new AuthDAO();
         GameDAO gameDAO = new GameDAO();
-        ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
+        //ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
         this.userService = new UserService(userDAO,authDAO);
         this.gameService = new GameService(gameDAO,authDAO);
         // Register endpoints and exception handlers
