@@ -80,14 +80,12 @@ public class GameService {
                 throw new DataAccessException("Error: already taken");
             }
             updatedWhite = username;
-        }
-        else if((request.playerColor()).equals("BLACK")) {
+        } else if((request.playerColor()).equals("BLACK")) {
             if (updatedBlack != null) {
                 throw new DataAccessException("Error: already taken");
             }
             updatedBlack = username;
-        }
-        else if(request.playerColor() != null && !request.playerColor().isEmpty()){
+        } else {
             throw new DataAccessException("Error: bad request");
         }
         GameData updatedGame = new GameData(request.gameID(),updatedWhite,updatedBlack,gameDAO.getGame(request.gameID()).gameName(),gameDAO.getGame(request.gameID()).game());
