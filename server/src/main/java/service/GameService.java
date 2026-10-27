@@ -32,7 +32,7 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
         //If not all fields are filled, then throw exception
-        if(request.gameName().isEmpty()){
+        if(request == null || request.gameName() == null || request.gameName().isEmpty()){
             throw new DataAccessException("Error: bad request");
         }
         // Create the User
@@ -42,8 +42,7 @@ public class GameService {
     }
 
     public record CreateGameRequest(String gameName){}
-
-    public record CreateGameResult(int ID){}
+    public record CreateGameResult(int gameID){}
 
     public ListGameResult listGame(String authToken) throws DataAccessException {
         if(authDAO.getAuth(authToken) == null){

@@ -32,8 +32,8 @@ public class GameServiceTest {
         GameService.CreateGameRequest request = new GameService.CreateGameRequest("My Chess Game");
         GameService.CreateGameResult result = gameService.createGame(request, validAuthToken);
 
-        Assertions.assertTrue(result.ID() >= 0);
-        Assertions.assertNotNull(gameDAO.getGame(result.ID()));
+        Assertions.assertTrue(result.gameID() >= 0);
+        Assertions.assertNotNull(gameDAO.getGame(result.gameID()));
     }
 
     @Test
@@ -67,21 +67,21 @@ public class GameServiceTest {
     public void joinGameSuccess() throws DataAccessException {
         GameService.CreateGameResult createResult = gameService.createGame(new GameService.CreateGameRequest("Join Game Test"), validAuthToken);
 
-        GameService.JoinGameRequest joinReq = new GameService.JoinGameRequest("WHITE", createResult.ID());
+        GameService.JoinGameRequest joinReq = new GameService.JoinGameRequest("WHITE", createResult.gameID());
         gameService.joinGame(joinReq, validAuthToken);
 
         // Verify the database actually updated the username
-        Assertions.assertEquals("player1", gameDAO.getGame(createResult.ID()).whiteUsername());
+        Assertions.assertEquals("player1", gameDAO.getGame(createResult.gameID()).whiteUsername());
     }
 
     @Test
     public void joinGameFailColorTaken() throws DataAccessException {
         // Create game and join as WHITE
         GameService.CreateGameResult createResult = gameService.createGame(new GameService.CreateGameRequest("Color Taken Game"), validAuthToken);
-        gameService.joinGame(new GameService.JoinGameRequest("WHITE", createResult.ID()), validAuthToken);
+        gameService.joinGame(new GameService.JoinGameRequest("WHITE", createResult.gameID()), validAuthToken);
 
         // Try to join as WHITE again
-        GameService.JoinGameRequest badJoinReq = new GameService.JoinGameRequest("WHITE", createResult.ID());
+        GameService.JoinGameRequest badJoinReq = new GameService.JoinGameRequest("WHITE", createResult.gameID());
 
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             gameService.joinGame(badJoinReq, validAuthToken);
