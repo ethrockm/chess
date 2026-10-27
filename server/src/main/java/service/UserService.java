@@ -69,9 +69,4 @@ public class UserService {
         AuthDAO.deleteAuth(authToken);
     }
 
-    public record LogoutRequest(String username){}
-
-    public record LogoutResult(String username) {
-
-    }
 }
