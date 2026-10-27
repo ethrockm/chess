@@ -75,12 +75,12 @@ public class GameService {
         String updatedWhite = getGame(request.gameID()).whiteUsername();
         String updatedBlack = getGame(request.gameID()).blackUsername();
 
-        if((request.playerColor()).equals("WHITE")) {
+        if("WHITE".equals(request.playerColor())) {
             if (updatedWhite != null) {
                 throw new DataAccessException("Error: already taken");
             }
             updatedWhite = username;
-        } else if((request.playerColor()).equals("BLACK")) {
+        } else if("BLACK".equals(request.playerColor())) {
             if (updatedBlack != null) {
                 throw new DataAccessException("Error: already taken");
             }
