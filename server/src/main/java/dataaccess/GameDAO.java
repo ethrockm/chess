@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class GameDAO {
     private static final HashMap<Integer, GameData> games = new HashMap<>();
-    private static int nextGameID = 0;
+    private static int nextGameID = 1;
 
     public static int createGame(GameData game){
         int gameID = nextGameID++;
@@ -25,7 +25,7 @@ public class GameDAO {
         return games.values();
     }
 
-    public static void updatGame(GameData gamedata){
+    public static void updateGame(GameData gamedata){
         games.put(gamedata.GameID(), gamedata);
     }
 

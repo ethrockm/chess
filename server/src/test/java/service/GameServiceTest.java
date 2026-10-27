@@ -32,7 +32,7 @@ public class GameServiceTest {
         GameService.CreateGameRequest request = new GameService.CreateGameRequest("My Chess Game");
         GameService.CreateGameResult result = gameService.createGame(request, validAuthToken);
 
-        Assertions.assertTrue(result.gameID() >= 0);
+        Assertions.assertTrue(result.gameID() >= 1);
         Assertions.assertNotNull(gameDAO.getGame(result.gameID()));
     }
 

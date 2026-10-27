@@ -61,6 +61,9 @@ public class GameService {
 
 
     public void joinGame(JoinGameRequest request, String authToken) throws DataAccessException{
+        if(request == null){
+            throw new DataAccessException("Error: bad request");
+        }
         if(authDAO.getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -88,7 +91,7 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
         GameData updatedGame = new GameData(request.gameID(),updatedWhite,updatedBlack,gameDAO.getGame(request.gameID()).gameName(),gameDAO.getGame(request.gameID()).game());
-        GameDAO.updatGame(updatedGame);
+        GameDAO.updateGame(updatedGame);
     }
 
     public record JoinGameRequest(String playerColor, int gameID){}
