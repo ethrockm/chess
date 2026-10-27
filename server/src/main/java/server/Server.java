@@ -44,9 +44,12 @@ public class Server {
     private void joinGameHandler(Context ctx){
         try {
             String authToken = ctx.header("authorization");
-            GameService.CreateGameRequest request = gson.fromJson(ctx.body(), GameService.CreateGameRequest.class);
-            GameService.CreateGameResult result = gameService.createGame(request,authToken);
-            ctx.status(200).result(gson.toJson(result));
+            GameService.JoinGameRequest request = gson.fromJson(ctx.body(), GameService.JoinGameRequest.class);
+            if(request == null){
+                throw new DataAccessException("Error: bad request");
+            }
+            gameService.joinGame(request,authToken);
+            ctx.status(200).result("{}");
         } catch (DataAccessException e) {
             if(e.getMessage().equals("Error: bad request")){
                 ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));

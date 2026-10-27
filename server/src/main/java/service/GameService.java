@@ -61,7 +61,36 @@ public class GameService {
     public record ListGameResult(Collection<GameInfo> games){}
 
 
-    void joinGame(){
+    public void joinGame(JoinGameRequest request, String authToken) throws DataAccessException{
+        if(authDAO.getAuth(authToken) == null){
+            throw new DataAccessException("Error: unauthorized");
+        }
+        if(gameDAO.getGame(request.gameID()) == null){
+            throw new DataAccessException("Error: bad request");
+        }
 
+        String username = authDAO.getAuth(authToken).username();
+        String updatedWhite = getGame(request.gameID()).whiteUsername();
+        String updatedBlack = getGame(request.gameID()).blackUsername();
+
+        if((request.playerColor()).equals("WHITE")) {
+            if (updatedWhite != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            updatedWhite = username;
+        }
+        else if((request.playerColor()).equals("BLACK")) {
+            if (updatedBlack != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            updatedBlack = username;
+        }
+        else if(request.playerColor() != null && !request.playerColor().isEmpty()){
+            throw new DataAccessException("Error: bad request");
+        }
+        GameData updatedGame = new GameData(request.gameID(),updatedWhite,updatedBlack,gameDAO.getGame(request.gameID()).gameName(),gameDAO.getGame(request.gameID()).game());
+        GameDAO.updatGame(updatedGame);
     }
+
+    public record JoinGameRequest(String playerColor, int gameID){}
 }
