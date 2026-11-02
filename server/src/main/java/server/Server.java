@@ -10,6 +10,8 @@ import dataaccess.MemoryUserDAO;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
+import dataaccess.DatabaseManager;
+import java.sql.Connection;
 
 import java.util.Map;
 
@@ -39,6 +41,44 @@ public class Server {
         javalin.post("/game", this::createGameHandler);
         javalin.get("/game", this::listGameHandler);
         javalin.put("/game", this::joinGameHandler);
+    }
+
+    private void configureDatabase(){
+        try{
+            DatabaseManager.createDatabase();
+
+            try(Connection conn = DatabaseManager.getConnection()) {
+                var createUsers = """
+                    CREATE TABLE IF NOT EXISTS users (
+                      username VARCHAR(255) NOT NULL,
+                      password VARCHAR(255) NOT NULL,
+                      email VARCHAR(255) NOT NULL,
+                      PRIMARY KEY (username)
+                    )""";
+
+                var createAuths = """
+                    CREATE TABLE IF NOT EXISTS auths (
+                      authToken VARCHAR(255) NOT NULL,
+                      username VARCHAR(255) NOT NULL,
+                      PRIMARY KEY (authToken)
+                    )""";
+
+                var createGames = """
+                    CREATE TABLE IF NOT EXISTS games (
+                      gameID INT NOT NULL AUTO_INCREMENT,
+                      whiteusername VARCHAR(255),
+                      blackusername VARCHAR(255),
+                      gameName VARCHAR(255) NOT NULL,
+                      game TEXT NOT NULL,
+                      PRIMARY KEY (gameID)
+                    )""";
+                conn.prepareStatement(createUsers).executeUpdate();
+                conn.prepareStatement(createAuths).executeUpdate();
+                conn.prepareStatement(createGames).executeUpdate();
+            }
+        } catch (Exception e){
+            System.out.printf("Unable to confiugre database: %s%n", e.getMessage());
+        }
     }
 
     private void joinGameHandler(Context ctx){
