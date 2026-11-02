@@ -5,29 +5,34 @@ import model.AuthData;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MemoryAuthDAO {
+public class MemoryAuthDAO implements AuthDAO{
     private static final HashMap<String, AuthData> auths = new HashMap<>();
 
-    public static AuthData createAuth(String username){
+    @Override
+    public AuthData createAuth(String username){
         String token = generateToken();
         AuthData authData = new AuthData(token,username);
         auths.put(token, authData);
         return authData;
     }
 
+    @Override
     public AuthData getAuth(String username) {
         return auths.get(username);
     }
 
-    public static void deleteAuth(String username){
+    @Override
+    public void deleteAuth(String username){
         auths.remove(username);
     }
 
+    @Override
     public void clear(){
         auths.clear();
     }
 
-    public static String generateToken() {
+    @Override
+    public String generateToken() {
         return UUID.randomUUID().toString();
     }
 }

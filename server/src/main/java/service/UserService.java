@@ -30,7 +30,7 @@ public class UserService {
         UserData newUser = new UserData(request.username(),request.password(),request.email());
         userDAO.createUser(newUser);
         //Get an AuthToken
-        AuthData newToken = MemoryAuthDAO.createAuth(newUser.username());
+        AuthData newToken = authDAO.createAuth(newUser.username());
         //Return the RegisterResult
         return new RegisterResult(newUser.username(),newToken.authToken());
     }
@@ -49,7 +49,7 @@ public class UserService {
             throw new DataAccessException("Error: unauthorized"); //Wrong password
         }
 
-        AuthData newToken = MemoryAuthDAO.createAuth(request.username());
+        AuthData newToken = authDAO.createAuth(request.username());
         return new LoginResult(request.username(), newToken.authToken());
     }
 
@@ -64,7 +64,7 @@ public class UserService {
         if(authData == null){
             throw new DataAccessException("Error: unauthorized"); //Missing field info
         }
-        MemoryAuthDAO.deleteAuth(authToken);
+        authDAO.deleteAuth(authToken);
     }
 
 }
