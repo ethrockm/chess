@@ -4,17 +4,17 @@ import dataaccess.*;
 import org.junit.jupiter.api.*;
 
 public class GameServiceTest {
-    private UserDAO userDAO;
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
+    private MemoryUserDAO userDAO;
+    private MemoryAuthDAO authDAO;
+    private MemoryGameDAO gameDAO;
     private GameService gameService;
     private String validAuthToken;
 
     @BeforeEach
     public void setup() throws DataAccessException {
-        userDAO = new UserDAO();
-        authDAO = new AuthDAO();
-        gameDAO = new GameDAO();
+        userDAO = new MemoryUserDAO();
+        authDAO = new MemoryAuthDAO();
+        gameDAO = new MemoryGameDAO();
         gameService = new GameService(gameDAO, authDAO);
 
         userDAO.clearUsers();

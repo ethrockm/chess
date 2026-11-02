@@ -1,12 +1,12 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
+import dataaccess.MemoryGameDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
-import dataaccess.UserDAO;
+import dataaccess.MemoryUserDAO;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -24,9 +24,9 @@ public class Server {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Initialize DAO and Service
-        UserDAO userDAO = new UserDAO();
-        AuthDAO authDAO = new AuthDAO();
-        GameDAO gameDAO = new GameDAO();
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
         //ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
         this.userService = new UserService(userDAO,authDAO);
         this.gameService = new GameService(gameDAO,authDAO);

@@ -6,16 +6,16 @@ import chess.ChessGame;
 import org.junit.jupiter.api.*;
 
 public class ClearServiceTest {
-    private UserDAO userDAO;
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
+    private MemoryUserDAO userDAO;
+    private MemoryAuthDAO authDAO;
+    private MemoryGameDAO gameDAO;
     private ClearService clearService;
 
     @BeforeEach
     public void setup() throws DataAccessException {
-        userDAO = new UserDAO();
-        authDAO = new AuthDAO();
-        gameDAO = new GameDAO();
+        userDAO = new MemoryUserDAO();
+        authDAO = new MemoryAuthDAO();
+        gameDAO = new MemoryGameDAO();
         clearService = new ClearService(userDAO, gameDAO, authDAO);
 
         // Inject dummy data to verify the clear function actually removes it

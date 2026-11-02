@@ -1,28 +1,21 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
-import model.AuthData;
+import dataaccess.MemoryGameDAO;
 import model.GameData;
-import model.UserData;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
-import static dataaccess.GameDAO.getGame;
-import static dataaccess.GameDAO.getGames;
-import static dataaccess.UserDAO.getUser;
 
 
 public class GameService {
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private MemoryGameDAO gameDAO;
+    private MemoryAuthDAO authDAO;
 
-    public GameService(GameDAO gameDAO, AuthDAO authDAO){
+    public GameService(MemoryGameDAO gameDAO, MemoryAuthDAO authDAO){
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
@@ -37,7 +30,7 @@ public class GameService {
         }
         // Create the User
         GameData newGame = new GameData(0,null,null,request.gameName(),new ChessGame());
-        int gameID = GameDAO.createGame(newGame);
+        int gameID = gameDAO.createGame(newGame);
         return new CreateGameResult(gameID);
     }
 
@@ -48,7 +41,7 @@ public class GameService {
         if(authDAO.getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
-        Collection<model.GameData> allGames = getGames();
+        Collection<model.GameData> allGames = gameDAO.getGames();
         Collection<GameInfo> gamesFormatted = new ArrayList<>();
         for (model.GameData game: allGames){
             gamesFormatted.add(new GameInfo(game.GameID(),game.whiteUsername(),game.blackUsername(),game.gameName()));
@@ -72,8 +65,8 @@ public class GameService {
         }
 
         String username = authDAO.getAuth(authToken).username();
-        String updatedWhite = getGame(request.gameID()).whiteUsername();
-        String updatedBlack = getGame(request.gameID()).blackUsername();
+        String updatedWhite = gameDAO.getGame(request.gameID()).whiteUsername();
+        String updatedBlack = gameDAO.getGame(request.gameID()).blackUsername();
 
         if("WHITE".equals(request.playerColor())) {
             if (updatedWhite != null) {
@@ -89,7 +82,7 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
         GameData updatedGame = new GameData(request.gameID(),updatedWhite,updatedBlack,gameDAO.getGame(request.gameID()).gameName(),gameDAO.getGame(request.gameID()).game());
-        GameDAO.updateGame(updatedGame);
+        gameDAO.updateGame(updatedGame);
     }
 
     public record JoinGameRequest(String playerColor, int gameID){}

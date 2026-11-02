@@ -5,14 +5,14 @@ import org.junit.jupiter.api.*;
 
 public class UserServiceTest {
 
-    private UserDAO userDAO;
-    private AuthDAO authDAO;
+    private MemoryUserDAO userDAO;
+    private MemoryAuthDAO authDAO;
     private UserService userService;
 
     @BeforeEach
     public void setup() throws DataAccessException {
-        userDAO = new UserDAO();
-        authDAO = new AuthDAO();
+        userDAO = new MemoryUserDAO();
+        authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
         userDAO.clearUsers();
         authDAO.clear();
