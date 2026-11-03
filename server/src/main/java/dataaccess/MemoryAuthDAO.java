@@ -10,7 +10,7 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public AuthData createAuth(String username){
-        String token = generateToken();
+        String token = UUID.randomUUID().toString();
         AuthData authData = new AuthData(token,username);
         auths.put(token, authData);
         return authData;
@@ -29,10 +29,5 @@ public class MemoryAuthDAO implements AuthDAO{
     @Override
     public void clear(){
         auths.clear();
-    }
-
-    @Override
-    public String generateToken() {
-        return UUID.randomUUID().toString();
     }
 }

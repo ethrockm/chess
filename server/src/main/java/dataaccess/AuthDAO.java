@@ -2,15 +2,16 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.sql.SQLException;
+
 public interface AuthDAO {
 
-    public AuthData createAuth(String username);
+    public AuthData createAuth(String username) throws SQLException, DataAccessException;
 
-    public AuthData getAuth(String username);
+    public AuthData getAuth(String username) throws DataAccessException;
 
-    public void deleteAuth(String username);
+    public void deleteAuth(String username) throws SQLException, DataAccessException;
 
-    public void clear();
+    public void clear() throws SQLException, DataAccessException;
 
-    public String generateToken();
 }
