@@ -5,6 +5,7 @@ import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 import dataaccess.MemoryAuthDAO;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -45,7 +46,7 @@ public class UserService {
         if(request.username() == null || request.username().isEmpty() || request.password() == null || request.password().isEmpty()){
             throw new DataAccessException("Error: bad request"); //Missing field info
         }
-        if(userDAO.getUser(request.username) == null || !Objects.equals(userDAO.getUser(request.username()).password(), request.password())){
+        if(userDAO.getUser(request.username) == null || !BCrypt.checkpw(userDAO.getUser(request.username()).password(), request.password())){
             throw new DataAccessException("Error: unauthorized"); //Wrong password
         }
 

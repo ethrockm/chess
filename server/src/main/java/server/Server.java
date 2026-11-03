@@ -48,14 +48,6 @@ public class Server {
             DatabaseManager.createDatabase();
 
             try(Connection conn = DatabaseManager.getConnection()) {
-                var createUsers = """
-                    CREATE TABLE IF NOT EXISTS users (
-                      username VARCHAR(255) NOT NULL,
-                      password VARCHAR(255) NOT NULL,
-                      email VARCHAR(255) NOT NULL,
-                      PRIMARY KEY (username)
-                    )""";
-
                 var createAuths = """
                     CREATE TABLE IF NOT EXISTS auths (
                       authToken VARCHAR(255) NOT NULL,
@@ -72,7 +64,6 @@ public class Server {
                       game TEXT NOT NULL,
                       PRIMARY KEY (gameID)
                     )""";
-                conn.prepareStatement(createUsers).executeUpdate();
                 conn.prepareStatement(createAuths).executeUpdate();
                 conn.prepareStatement(createGames).executeUpdate();
             }
