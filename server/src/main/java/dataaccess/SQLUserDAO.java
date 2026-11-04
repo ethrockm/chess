@@ -16,16 +16,14 @@ public class SQLUserDAO implements UserDAO {
         try {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
-                var createGames = """
-                    CREATE TABLE IF NOT EXISTS games (
-                      gameID INT NOT NULL AUTO_INCREMENT,
-                      whiteusername VARCHAR(255),
-                      blackusername VARCHAR(255),
-                      gameName VARCHAR(255) NOT NULL,
-                      game TEXT NOT NULL,
-                      PRIMARY KEY (gameID)
+                var createUsers = """
+                    CREATE TABLE IF NOT EXISTS users (
+                      username VARCHAR(255) NOT NULL,
+                      password VARCHAR(255) NOT NULL,
+                      email VARCHAR(255) NOT NULL,
+                      PRIMARY KEY (username)
                     )""";
-                conn.prepareStatement(createGames).executeUpdate();
+                conn.prepareStatement(createUsers).executeUpdate();
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
@@ -34,11 +32,10 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData user) {
-        String hashedPass = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-
         var statement = "INSERT INTO users (username, password, email) VALUES (?,?,?)";
         try {
-            executeUpdate(statement, user.username(), hashedPass, user.email());
+            // Just insert user.password() directly
+            executeUpdate(statement, user.username(), user.password(), user.email());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {

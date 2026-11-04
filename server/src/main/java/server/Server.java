@@ -9,7 +9,6 @@ import service.GameService;
 import service.UserService;
 
 import java.sql.Connection;
-
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -28,14 +27,14 @@ public class Server {
             UserDAO userDAO = new SQLUserDAO();
             AuthDAO authDAO = new SQLAuthDAO();
             GameDAO gameDAO = new SQLGameDAO();
-            //ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
             this.userService = new UserService(userDAO, authDAO);
             this.gameService = new GameService(gameDAO, authDAO);
             this.clearService = new ClearService(userDAO, gameDAO, authDAO);
         } catch (dataaccess.DataAccessException e) {
             System.out.printf("Server failed to start: %s%n", e.getMessage());
         }
-        // Register endpoints and exception handlers
+
+        // Register endpoints
         javalin.post("/user", this::registerHandler);
         javalin.post("/session", this::loginHandler);
         javalin.delete("/session", this::logoutHandler);
@@ -43,13 +42,35 @@ public class Server {
         javalin.post("/game", this::createGameHandler);
         javalin.get("/game", this::listGameHandler);
         javalin.put("/game", this::joinGameHandler);
+
+        // Global Exception Handler
+        javalin.exception(Exception.class, (e, req) -> {
+            String message = e.getMessage();
+            if (message == null) {
+                message = "Error: Internal server error";
+            }
+
+            // Route the exception to the proper HTTP status code
+            if (message.contains("bad request")) {
+                req.status(400);
+            } else if (message.contains("unauthorized")) {
+                req.status(401);
+            } else if (message.contains("already taken")) {
+                req.status(403);
+            } else {
+                req.status(500);
+            }
+
+            // Serialize the error using Gson
+            req.result(gson.toJson(Map.of("message", message)));
+        });
     }
 
     private void configureDatabase(){
         try{
             DatabaseManager.createDatabase();
         } catch (Exception e){
-            System.out.printf("Unable to confiugre database: %s%n", e.getMessage());
+            System.out.printf("Unable to configure database: %s%n", e.getMessage());
         }
     }
 
@@ -95,7 +116,6 @@ public class Server {
     private void listGameHandler(Context ctx){
         try {
             String authToken = ctx.header("authorization");
-            //GameService.ListGameRequest request = gson.fromJson(ctx.body(), GameService.CreateGameRequest.class);
             GameService.ListGameResult result = gameService.listGame(authToken);
             ctx.status(200).result(gson.toJson(result));
         } catch (DataAccessException e) {

@@ -23,14 +23,14 @@ public class SQLGameDAO implements GameDAO {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
                 var createGames = """
-                    CREATE TABLE IF NOT EXISTS games (
-                      gameID INT NOT NULL AUTO_INCREMENT,
-                      whiteusername VARCHAR(255),
-                      blackusername VARCHAR(255),
-                      gameName VARCHAR(255) NOT NULL,
-                      game TEXT NOT NULL,
-                      PRIMARY KEY (gameID)
-                    )""";
+                CREATE TABLE IF NOT EXISTS games (
+                  gameID INT NOT NULL AUTO_INCREMENT,
+                  whiteUsername VARCHAR(255),
+                  blackUsername VARCHAR(255),
+                  gameName VARCHAR(255) NOT NULL,
+                  game TEXT NOT NULL,
+                  PRIMARY KEY (gameID)
+                )""";
                 conn.prepareStatement(createGames).executeUpdate();
             }
         } catch (Exception e) {
