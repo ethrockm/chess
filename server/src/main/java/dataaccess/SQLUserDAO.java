@@ -31,15 +31,13 @@ public class SQLUserDAO implements UserDAO {
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, password, email) VALUES (?,?,?)";
         try {
-            // Just insert user.password() directly
-            executeUpdate(statement, user.username(), user.password(), user.email());
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            executeUpdate(statement, user.username(), hashedPassword, user.email());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -51,27 +49,23 @@ public class SQLUserDAO implements UserDAO {
                 ps.setString(1,username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()){
-                        return new UserData(rs.getString("username"),rs.getString("password"),rs.getString("email"));
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                     }
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
         }
-        return null;
+        return null; // Notice no RuntimeException catch block here!
     }
 
     @Override
-    public void clearUsers() {
+    public void clearUsers() throws DataAccessException {
         var statement = "TRUNCATE TABLE users";
         try {
             executeUpdate(statement);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 

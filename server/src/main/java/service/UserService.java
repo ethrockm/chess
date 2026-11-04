@@ -17,22 +17,18 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException, SQLException {
-        //If not all fields are filled, then throw exception
         if(request.username() == null || request.username().isEmpty() || request.email() == null || request.email().isEmpty() || request.password() == null || request.password().isEmpty()){
-            throw new DataAccessException("Error: bad request"); //Missing field info
+            throw new DataAccessException("Error: bad request");
         }
-        //If username already taken, the throw exception
         if(userDAO.getUser(request.username()) != null){
             throw new DataAccessException("Error: already taken");
         }
-        String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(request.password(), org.mindrot.jbcrypt.BCrypt.gensalt());
-        // Create the User
-        UserData newUser = new UserData(request.username(),hashedPassword,request.email());
+
+        UserData newUser = new UserData(request.username(), request.password(), request.email());
         userDAO.createUser(newUser);
-        //Get an AuthToken
+
         AuthData newToken = authDAO.createAuth(newUser.username());
-        //Return the RegisterResult
-        return new RegisterResult(newUser.username(),newToken.authToken());
+        return new RegisterResult(newUser.username(), newToken.authToken());
     }
 
     public record RegisterRequest(String username, String password, String email) {
@@ -42,11 +38,14 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest request) throws DataAccessException, SQLException {
-        if(request.username() == null || request.username().isEmpty() || request.password() == null || request.password().isEmpty()){
-            throw new DataAccessException("Error: bad request"); //Missing field info
+        if(request.username() == null || request.password() == null){
+            throw new DataAccessException("Error: bad request");
         }
-        if(userDAO.getUser(request.username()) == null || !org.mindrot.jbcrypt.BCrypt.checkpw(userDAO.getUser(request.username()).password(), request.password())){
-            throw new DataAccessException("Error: unauthorized"); //Wrong password
+
+        UserData user = userDAO.getUser(request.username());
+
+        if (user == null || !org.mindrot.jbcrypt.BCrypt.checkpw(request.password(), user.password())) {
+            throw new DataAccessException("Error: unauthorized");
         }
 
         AuthData newToken = authDAO.createAuth(request.username());
