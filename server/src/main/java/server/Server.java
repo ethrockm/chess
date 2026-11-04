@@ -48,23 +48,9 @@ public class Server {
             DatabaseManager.createDatabase();
 
             try(Connection conn = DatabaseManager.getConnection()) {
-                var createAuths = """
-                    CREATE TABLE IF NOT EXISTS auths (
-                      authToken VARCHAR(255) NOT NULL,
-                      username VARCHAR(255) NOT NULL,
-                      PRIMARY KEY (authToken)
-                    )""";
 
-                var createGames = """
-                    CREATE TABLE IF NOT EXISTS games (
-                      gameID INT NOT NULL AUTO_INCREMENT,
-                      whiteusername VARCHAR(255),
-                      blackusername VARCHAR(255),
-                      gameName VARCHAR(255) NOT NULL,
-                      game TEXT NOT NULL,
-                      PRIMARY KEY (gameID)
-                    )""";
-                conn.prepareStatement(createAuths).executeUpdate();
+
+
                 conn.prepareStatement(createGames).executeUpdate();
             }
         } catch (Exception e){
