@@ -5,6 +5,8 @@ import model.UserData;
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
 
+import java.sql.SQLException;
+
 public class ClearServiceTest {
     private MemoryUserDAO userDAO;
     private MemoryAuthDAO authDAO;
@@ -25,7 +27,7 @@ public class ClearServiceTest {
     }
 
     @Test
-    public void clearSuccess() throws DataAccessException {
+    public void clearSuccess() throws DataAccessException, SQLException {
         clearService.clear();
 
         // Assert all databases are completely empty

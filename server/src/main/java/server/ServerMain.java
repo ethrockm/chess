@@ -1,7 +1,9 @@
 package server;
 
+import dataaccess.DataAccessException;
+
 public class ServerMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws DataAccessException {
         var port = 8080;
         Server server = new Server();
         server.run(port);

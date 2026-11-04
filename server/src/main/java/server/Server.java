@@ -1,38 +1,40 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
-import dataaccess.MemoryUserDAO;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
-import dataaccess.DatabaseManager;
+
 import java.sql.Connection;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 public class Server {
-    private final UserService userService;
-    private final GameService gameService;
+    private UserService userService;
+    private GameService gameService;
     private final Gson gson = new Gson();
     private final Javalin javalin;
-    private final ClearService clearService;
+    private ClearService clearService;
 
     public Server() {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Initialize DAO and Service
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
-        //ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
-        this.userService = new UserService(userDAO,authDAO);
-        this.gameService = new GameService(gameDAO,authDAO);
-        this.clearService = new ClearService(userDAO,gameDAO,authDAO);
+        try {
+            UserDAO userDAO = new SQLUserDAO();
+            AuthDAO authDAO = new SQLAuthDAO();
+            GameDAO gameDAO = new SQLGameDAO();
+            //ClearService clearService = new ClearService(userDAO,gameDAO,authDAO);
+            this.userService = new UserService(userDAO, authDAO);
+            this.gameService = new GameService(gameDAO, authDAO);
+            this.clearService = new ClearService(userDAO, gameDAO, authDAO);
+        } catch (dataaccess.DataAccessException e) {
+            System.out.printf("Server failed to start: %s%n", e.getMessage());
+        }
         // Register endpoints and exception handlers
         javalin.post("/user", this::registerHandler);
         javalin.post("/session", this::loginHandler);
@@ -60,7 +62,7 @@ public class Server {
             }
             gameService.joinGame(request,authToken);
             ctx.status(200).result("{}");
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | SQLException e) {
             if(e.getMessage().equals("Error: bad request")){
                 ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
             } else if(e.getMessage().equals("Error: unauthorized")){
@@ -79,7 +81,7 @@ public class Server {
             GameService.CreateGameRequest request = gson.fromJson(ctx.body(), GameService.CreateGameRequest.class);
             GameService.CreateGameResult result = gameService.createGame(request,authToken);
             ctx.status(200).result(gson.toJson(result));
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | SQLException e) {
             if(e.getMessage().equals("Error: bad request")){
                 ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
             } else if(e.getMessage().equals("Error: unauthorized")){
@@ -110,7 +112,7 @@ public class Server {
             UserService.RegisterRequest request = gson.fromJson(ctx.body(), UserService.RegisterRequest.class);
             UserService.RegisterResult result = userService.register(request);
             ctx.status(200).result(gson.toJson(result));
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | SQLException e) {
             if(e.getMessage().equals("Error: bad request")){
                 ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
             } else if(e.getMessage().equals("Error: already taken")){
@@ -127,6 +129,8 @@ public class Server {
             ctx.status(200).result(gson.toJson(Map.of()));
         } catch (DataAccessException e){
             ctx.status(500).result(gson.toJson(Map.of("message","Error: " + e.getMessage())));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -135,7 +139,7 @@ public class Server {
             UserService.LoginRequest request = gson.fromJson(ctx.body(), UserService.LoginRequest.class);
             UserService.LoginResult result = userService.login(request);
             ctx.status(200).result(gson.toJson(result));
-        } catch (DataAccessException e){
+        } catch (DataAccessException | SQLException e){
             if(e.getMessage().equals("Error: bad request")){
                 ctx.status(400).result(gson.toJson(Map.of("message", e.getMessage())));
             } else if(e.getMessage().equals("Error: unauthorized")){
@@ -151,7 +155,7 @@ public class Server {
             String authToken = ctx.header("authorization");
             userService.logout(authToken);
             ctx.status(200).result("{}");
-        } catch (DataAccessException e){
+        } catch (DataAccessException | SQLException e){
             if(e.getMessage().equals("Error: unauthorized")){
                 ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
             } else {

@@ -1,24 +1,22 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import dataaccess.MemoryAuthDAO;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.Objects;
+import java.sql.SQLException;
 
 public class UserService {
-    private final MemoryUserDAO userDAO;
-    private final MemoryAuthDAO authDAO;
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
 
-    public UserService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO) {
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws DataAccessException, SQLException {
         //If not all fields are filled, then throw exception
         if(request.username() == null || request.username().isEmpty() || request.email() == null || request.email().isEmpty() || request.password() == null || request.password().isEmpty()){
             throw new DataAccessException("Error: bad request"); //Missing field info
@@ -27,8 +25,9 @@ public class UserService {
         if(userDAO.getUser(request.username()) != null){
             throw new DataAccessException("Error: already taken");
         }
+        String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(request.password(), org.mindrot.jbcrypt.BCrypt.gensalt());
         // Create the User
-        UserData newUser = new UserData(request.username(),request.password(),request.email());
+        UserData newUser = new UserData(request.username(),hashedPassword,request.email());
         userDAO.createUser(newUser);
         //Get an AuthToken
         AuthData newToken = authDAO.createAuth(newUser.username());
@@ -42,11 +41,11 @@ public class UserService {
     public record RegisterResult(String username, String authToken) {
     }
 
-    public LoginResult login(LoginRequest request) throws DataAccessException {
+    public LoginResult login(LoginRequest request) throws DataAccessException, SQLException {
         if(request.username() == null || request.username().isEmpty() || request.password() == null || request.password().isEmpty()){
             throw new DataAccessException("Error: bad request"); //Missing field info
         }
-        if(userDAO.getUser(request.username) == null || !BCrypt.checkpw(userDAO.getUser(request.username()).password(), request.password())){
+        if(userDAO.getUser(request.username()) == null || !org.mindrot.jbcrypt.BCrypt.checkpw(userDAO.getUser(request.username()).password(), request.password())){
             throw new DataAccessException("Error: unauthorized"); //Wrong password
         }
 
@@ -60,7 +59,7 @@ public class UserService {
     public record LoginResult(String username, String authToken){
     }
 
-    public void logout(String authToken) throws DataAccessException {
+    public void logout(String authToken) throws DataAccessException, SQLException {
         AuthData authData = authDAO.getAuth(authToken);
         if(authData == null){
             throw new DataAccessException("Error: unauthorized"); //Missing field info

@@ -3,6 +3,8 @@ package service;
 import dataaccess.*;
 import org.junit.jupiter.api.*;
 
+import java.sql.SQLException;
+
 public class GameServiceTest {
     private MemoryUserDAO userDAO;
     private MemoryAuthDAO authDAO;
@@ -11,7 +13,7 @@ public class GameServiceTest {
     private String validAuthToken;
 
     @BeforeEach
-    public void setup() throws DataAccessException {
+    public void setup() throws DataAccessException, SQLException {
         userDAO = new MemoryUserDAO();
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDAO();
@@ -28,7 +30,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void createGameSuccess() throws DataAccessException {
+    public void createGameSuccess() throws DataAccessException, SQLException {
         GameService.CreateGameRequest request = new GameService.CreateGameRequest("My Chess Game");
         GameService.CreateGameResult result = gameService.createGame(request, validAuthToken);
 
@@ -47,7 +49,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void listGamesSuccess() throws DataAccessException {
+    public void listGamesSuccess() throws DataAccessException, SQLException {
         gameService.createGame(new GameService.CreateGameRequest("Game 1"), validAuthToken);
         gameService.createGame(new GameService.CreateGameRequest("Game 2"), validAuthToken);
 
@@ -64,7 +66,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void joinGameSuccess() throws DataAccessException {
+    public void joinGameSuccess() throws DataAccessException, SQLException {
         GameService.CreateGameResult createResult = gameService.createGame(new GameService.CreateGameRequest("Join Game Test"), validAuthToken);
 
         GameService.JoinGameRequest joinReq = new GameService.JoinGameRequest("WHITE", createResult.gameID());
@@ -75,7 +77,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void joinGameFailColorTaken() throws DataAccessException {
+    public void joinGameFailColorTaken() throws DataAccessException, SQLException {
         // Create game and join as WHITE
         GameService.CreateGameResult createResult = gameService.createGame(new GameService.CreateGameRequest("Color Taken Game"), validAuthToken);
         gameService.joinGame(new GameService.JoinGameRequest("WHITE", createResult.gameID()), validAuthToken);

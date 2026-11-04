@@ -3,6 +3,8 @@ package service;
 import dataaccess.*;
 import org.junit.jupiter.api.*;
 
+import java.sql.SQLException;
+
 public class UserServiceTest {
 
     private MemoryUserDAO userDAO;
@@ -19,7 +21,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void registerSuccess() throws DataAccessException {
+    public void registerSuccess() throws DataAccessException, SQLException {
         UserService.RegisterRequest request = new UserService.RegisterRequest("newUser", "pass", "email@test.com");
         UserService.RegisterResult result = userService.register(request);
 
@@ -28,7 +30,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void registerFailDuplicate() throws DataAccessException {
+    public void registerFailDuplicate() throws DataAccessException, SQLException {
         UserService.RegisterRequest request = new UserService.RegisterRequest("duplicateUser", "pass", "email");
         userService.register(request);
 
@@ -39,7 +41,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginSuccess() throws DataAccessException {
+    public void loginSuccess() throws DataAccessException, SQLException {
         userService.register(new UserService.RegisterRequest("loginUser", "pass", "email"));
         UserService.LoginRequest loginReq = new UserService.LoginRequest("loginUser", "pass");
 
@@ -48,7 +50,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginFailWrongPassword() throws DataAccessException {
+    public void loginFailWrongPassword() throws DataAccessException, SQLException {
         userService.register(new UserService.RegisterRequest("loginUser", "pass", "email"));
         UserService.LoginRequest loginReq = new UserService.LoginRequest("loginUser", "WRONG");
 
@@ -59,7 +61,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logoutSuccess() throws DataAccessException {
+    public void logoutSuccess() throws DataAccessException, SQLException {
         UserService.RegisterResult regResult = userService.register(new UserService.RegisterRequest("logoutUser", "pass", "email"));
 
         // Logout should succeed without throwing an exception

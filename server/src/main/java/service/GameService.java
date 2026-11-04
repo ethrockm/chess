@@ -1,26 +1,25 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 
 
 public class GameService {
-    private MemoryGameDAO gameDAO;
-    private MemoryAuthDAO authDAO;
+    private GameDAO gameDAO;
+    private AuthDAO authDAO;
 
-    public GameService(MemoryGameDAO gameDAO, MemoryAuthDAO authDAO){
+    public GameService(GameDAO gameDAO, AuthDAO authDAO){
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
 
-    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
+    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException, SQLException {
         if(authDAO.getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -53,7 +52,7 @@ public class GameService {
     public record ListGameResult(Collection<GameInfo> games){}
 
 
-    public void joinGame(JoinGameRequest request, String authToken) throws DataAccessException{
+    public void joinGame(JoinGameRequest request, String authToken) throws DataAccessException, SQLException {
         if(request == null){
             throw new DataAccessException("Error: bad request");
         }
