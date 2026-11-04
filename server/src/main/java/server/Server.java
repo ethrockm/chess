@@ -46,13 +46,6 @@ public class Server {
     private void configureDatabase(){
         try{
             DatabaseManager.createDatabase();
-
-            try(Connection conn = DatabaseManager.getConnection()) {
-
-
-
-                conn.prepareStatement(createGames).executeUpdate();
-            }
         } catch (Exception e){
             System.out.printf("Unable to confiugre database: %s%n", e.getMessage());
         }

@@ -7,6 +7,7 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -73,14 +74,29 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public Collection<GameData> getGames() {
-        return List.of();
+    public Collection<GameData> getGames() throws DataAccessException {
+        var result = new ArrayList<GameData>();
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()){
+                        result.add(readGame(rs));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
     @Override
     public void updateGame(GameData gamedata) throws SQLException, DataAccessException {
         String gameJson = new Gson().toJson(gamedata.game());
-        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=?, WHERE gameID=?";
+        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
         executeUpdate(statement, gamedata.whiteUsername(), gamedata.blackUsername(), gamedata.gameName(), gameJson, gamedata.GameID());
     }
 
