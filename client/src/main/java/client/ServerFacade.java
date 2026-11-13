@@ -1,6 +1,8 @@
 package client;
 
 import model.AuthData;
+import model.GameData;
+import service.GameService;
 import service.UserService;
 
 import java.io.IOException;
@@ -74,6 +76,31 @@ public class ServerFacade {
 
         if (http.getResponseCode() != 200){
             throw new Exception("Server error code: " + http.getResponseCode());
+        }
+    }
+
+    public int createGame(String gameName, String authToken) throws Exception {
+        URL url = new URI(serverURL + "/game").toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setDoOutput(true);
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Authorization", authToken);
+
+        GameService.CreateGameRequest request = new GameService.CreateGameRequest(gameName);
+        String jsonBody = gson.toJson(request);
+        try (OutputStream os = http.getOutputStream()){
+            os.write(jsonBody.getBytes());
+        }
+
+        http.connect();
+
+        if (http.getResponseCode() != 200){
+            throw new Exception("Server error code: " + http.getResponseCode());
+        }
+        try (InputStream is = http.getInputStream()){
+            GameService.CreateGameResult result = gson.fromJson(new InputStreamReader(is), GameService.CreateGameResult.class);
+            return result.gameID();
         }
     }
 }
