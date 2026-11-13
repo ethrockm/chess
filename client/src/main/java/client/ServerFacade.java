@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.*;
 import com.google.gson.Gson;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 public class ServerFacade {
     private String serverURL;
@@ -101,6 +102,55 @@ public class ServerFacade {
         try (InputStream is = http.getInputStream()){
             GameService.CreateGameResult result = gson.fromJson(new InputStreamReader(is), GameService.CreateGameResult.class);
             return result.gameID();
+        }
+    }
+
+    public Collection<GameService.GameInfo> listGame(String authToken) throws Exception {
+        URL url = new URI(serverURL + "/game").toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("GET");
+        http.setRequestProperty("Authorization", authToken);
+        http.connect();
+
+        if (http.getResponseCode() != 200){
+            throw new Exception("Server error code: " + http.getResponseCode());
+        }
+        try (InputStream is = http.getInputStream()){
+            GameService.ListGameResult result = gson.fromJson(new InputStreamReader(is), GameService.ListGameResult.class);
+            return result.games();
+        }
+    }
+
+    public void joinGame(String playerColor, int gameID, String authToken) throws Exception {
+        URL url = new URI(serverURL + "/game").toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("PUT");
+        http.setDoOutput(true);
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Authorization", authToken);
+
+        GameService.JoinGameRequest request = new GameService.JoinGameRequest(playerColor,gameID);
+        String jsonBody = gson.toJson(request);
+        try (OutputStream os = http.getOutputStream()){
+            os.write(jsonBody.getBytes());
+        }
+
+        http.connect();
+
+        if (http.getResponseCode() != 200){
+            throw new Exception("Server error code: " + http.getResponseCode());
+        }
+    }
+
+    public void clear() throws Exception {
+        URL url = new URI(serverURL + "/db").toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+        http.setDoOutput(true);
+        http.connect();
+
+        if (http.getResponseCode() != 200){
+            throw new Exception("Server error code: " + http.getResponseCode());
         }
     }
 }
