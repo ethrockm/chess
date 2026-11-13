@@ -40,4 +40,40 @@ public class ServerFacade {
             return gson.fromJson(new InputStreamReader(is), AuthData.class);
         }
     }
+
+    public AuthData register(String username, String password, String email) throws Exception {
+        URL url = new URI(serverURL + "/user").toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setDoOutput(true);
+        http.setRequestProperty("Content-Type", "application/json");
+
+        UserService.RegisterRequest request = new UserService.RegisterRequest(username, password, email);
+        String jsonBody = gson.toJson(request);
+        try (OutputStream os = http.getOutputStream()){
+            os.write(jsonBody.getBytes());
+        }
+
+        http.connect();
+
+        if (http.getResponseCode() != 200){
+            throw new Exception("Server error code: " + http.getResponseCode());
+        }
+        try (InputStream is = http.getInputStream()){
+            return gson.fromJson(new InputStreamReader(is), AuthData.class);
+        }
+    }
+
+    public void logout(String authToken) throws Exception {
+        URL url = new URI(serverURL + "/session").toURL();
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+        http.setDoOutput(true);
+        http.setRequestProperty("Authorization", authToken);
+        http.connect();
+
+        if (http.getResponseCode() != 200){
+            throw new Exception("Server error code: " + http.getResponseCode());
+        }
+    }
 }
