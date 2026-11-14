@@ -6,7 +6,7 @@ public class REPL {
     private final ChessClient client;
 
     public REPL(int serverPort){
-        client = new ChessClient(serverPort);
+        this.client = new ChessClient(serverPort);
     }
 
     public void run() {
@@ -21,12 +21,15 @@ public class REPL {
 
             try {
                 result = client.eval(line);
-                System.out.print(result);
+                if (!result.equals("quit")){
+                    System.out.print(result);
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
             }
         }
+        System.out.print("Exiting Chess Client");
     }
 
     private void printPrompt() {
