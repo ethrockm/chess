@@ -15,8 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public class ServerFacade {
-    private String serverURL;
-    private final Gson gson = new Gson();
+    private static String serverURL;
+    private static final Gson gson = new Gson();
     public ServerFacade(int port){
         serverURL = "https://localhost" + port;
     }
