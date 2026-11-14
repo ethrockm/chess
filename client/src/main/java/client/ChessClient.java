@@ -21,13 +21,40 @@ public class ChessClient {
         var cmd = (token.length > 0) ? token[0] : "help";
         var params = Arrays.copyOfRange(token, 1, token.length);
 
-        return switch (cmd) {
-            case "register" -> helpRegister(params);
-            case "login" -> helpLogin(params);
-            case "quit" -> "quit";
+        if(!loggedIn) {
+            return switch (cmd) {
+                case "register" -> helpRegister(params);
+                case "login" -> helpLogin(params);
+                case "quit" -> "quit";
+                default -> help();
+            };
+        }
+        if(loggedIn){
+            return switch (cmd) {
+                case "createGame" -> helpCreateGame(params);
+                case "joinGame" -> helpJoinGame(params);
+                case "listGames" -> helpListGames(params);
+                case "logout" -> helpLogout(params);
+                case "quit" -> "quit";
+                default -> help();
+            };
+        }
+    }
 
-            default -> help();
-        };
+    private String helpLogout(String[] params) {
+        return "";
+    }
+
+    private String helpListGames(String[] params) {
+        return "";
+    }
+
+    private String helpJoinGame(String[] params) {
+        return "";
+    }
+
+    private String helpCreateGame(String[] params) {
+        return "";
     }
 
     public String helpRegister(String[] params) throws Exception {
