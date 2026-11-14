@@ -39,6 +39,7 @@ public class ChessClient {
                 default -> help();
             };
         }
+        return "error";  //Change Later
     }
 
     private String helpLogout(String[] params) {
