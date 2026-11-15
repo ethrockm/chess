@@ -22,14 +22,14 @@ public class REPL {
             try {
                 result = client.eval(line);
                 if (!result.equals("quit")){
-                    System.out.print(result);
+                    System.out.println(result);
                 }
             } catch (Throwable e) {
                 var msg = e.toString();
-                System.out.print(msg);
+                System.out.println(msg);
             }
         }
-        System.out.print("Exiting Chess Client");
+        System.out.println("Exiting Chess Client");
     }
 
     private void printPrompt() {

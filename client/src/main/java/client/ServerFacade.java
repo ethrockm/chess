@@ -15,10 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public class ServerFacade {
-    private static String serverURL;
+    private final String serverURL;
     private static final Gson gson = new Gson();
     public ServerFacade(int port){
-        serverURL = "https://localhost" + port;
+        this.serverURL = "http://localhost:" + port;
     }
 
     public AuthData login(String username, String password) throws Exception {
@@ -33,8 +33,6 @@ public class ServerFacade {
         try (OutputStream os = http.getOutputStream()){
             os.write(jsonBody.getBytes());
         }
-
-        http.connect();
 
         if (http.getResponseCode() != 200){
             throw new Exception("Server error code: " + http.getResponseCode());
@@ -57,8 +55,6 @@ public class ServerFacade {
             os.write(jsonBody.getBytes());
         }
 
-        http.connect();
-
         if (http.getResponseCode() != 200){
             throw new Exception("Server error code: " + http.getResponseCode());
         }
@@ -71,7 +67,6 @@ public class ServerFacade {
         URL url = new URI(serverURL + "/session").toURL();
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("DELETE");
-        http.setDoOutput(true);
         http.setRequestProperty("Authorization", authToken);
         http.connect();
 
@@ -93,8 +88,6 @@ public class ServerFacade {
         try (OutputStream os = http.getOutputStream()){
             os.write(jsonBody.getBytes());
         }
-
-        http.connect();
 
         if (http.getResponseCode() != 200){
             throw new Exception("Server error code: " + http.getResponseCode());
@@ -135,8 +128,6 @@ public class ServerFacade {
             os.write(jsonBody.getBytes());
         }
 
-        http.connect();
-
         if (http.getResponseCode() != 200){
             throw new Exception("Server error code: " + http.getResponseCode());
         }
@@ -146,7 +137,6 @@ public class ServerFacade {
         URL url = new URI(serverURL + "/db").toURL();
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("DELETE");
-        http.setDoOutput(true);
         http.connect();
 
         if (http.getResponseCode() != 200){
