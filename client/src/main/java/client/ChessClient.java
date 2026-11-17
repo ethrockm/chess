@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import model.AuthData;
 import service.GameService;
 
@@ -10,13 +11,17 @@ import java.util.Locale;
 public class ChessClient {
 
     private String currentUser;
+    private ChessGame currentGame;
+    private boolean isWhitePerspective;
     private String authToken;
     ServerFacade serverFacade;
     private boolean loggedIn;
+    private boolean inGame;
 
     public ChessClient(int serverPort){
         this.serverFacade = new ServerFacade(serverPort);
-        loggedIn = false;
+        this.loggedIn = false;
+        this.inGame = false;
     }
 
     public String eval(String input) throws Exception {
@@ -33,16 +38,39 @@ public class ChessClient {
                 default -> "Unknown command. Type 'help'.\n";
             };
         } else {
-            return switch (cmd) {
-                case "createGame" -> helpCreateGame(params);
-                case "joinGame" -> helpJoinGame(params);
-                case "listGames" -> helpListGames(params);
-                case "logout" -> helpLogout(params);
-                case "quit" -> "quit";
-                case "help" -> help();
-                default -> "Unknown command. Type 'help'.\n";
-            };
+            if(!inGame) {
+                return switch (cmd) {
+                    case "creategame" -> helpCreateGame(params);
+                    case "joingame" -> helpJoinGame(params);
+                    case "listgames" -> helpListGames(params);
+                    case "logout" -> helpLogout(params);
+                    case "quit" -> "quit";
+                    case "help" -> help();
+                    default -> "Unknown command. Type 'help'.\n";
+                };
+            }
+            else {
+                return switch (cmd) {
+                    case "redraw" -> helpRedraw(params);
+                    case "leave" -> helpLeave(params);
+                    case "quit" -> "quit";
+                    case "help" -> help();
+                    default -> "Unknown command. Type 'help'.\n";
+                };
+            }
         }
+    }
+
+    private String helpLeave(String[] params) {
+        if(params.length != 0){
+            return "Expected: leave\n";
+        }
+        inGame = false;
+        return "Left game\n";
+    }
+
+    private String helpRedraw(String[] params) {
+        return BoardDrawer.drawBoard(currentGame.getBoard(), isWhitePerspective);
     }
 
     private String helpLogout(String[] params) throws Exception {
@@ -63,7 +91,7 @@ public class ChessClient {
 
     private String helpListGames(String[] params) {
         if(params.length != 0){
-            return "Expected: listGames\n";
+            return "Expected: listgames\n";
         }
         try {
             Collection<GameService.GameInfo> games = serverFacade.listGame(authToken);
@@ -93,15 +121,25 @@ public class ChessClient {
 
     private String helpJoinGame(String[] params) {
         if(params.length != 2){
-            return "Expected: joinGame <playerColor> <gameID>\n";
+            return "Expected: joingame <playerColor> <gameID>\n";
         }
 
         String playerColor = params[0].toUpperCase();
         int gameID = Integer.parseInt(params[1]);
 
         try {
-            serverFacade.joinGame(playerColor,gameID,authToken);
-            return String.format("Successfully joined game: %s.\n", gameID);
+            if (!playerColor.equals("OBSERVER")){
+                serverFacade.joinGame(playerColor,gameID,authToken);
+            }
+
+            this.currentGame = new ChessGame();
+            this.isWhitePerspective = playerColor.equals("WHITE");
+            this.inGame = true;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("Successfully joined game: %s.\n", gameID));
+            sb.append(BoardDrawer.drawBoard(currentGame.getBoard(), isWhitePerspective));
+            return sb.toString();
         } catch (Exception e){
             return "Game joining failed: " + e.getMessage() + "\n";
         }
@@ -109,7 +147,7 @@ public class ChessClient {
 
     private String helpCreateGame(String[] params) throws Exception {
         if(params.length != 1){
-            return "Expected: createGame <gameName>\n";
+            return "Expected: creategame <gameName>\n";
         }
 
         String gameName = params[0];
@@ -164,8 +202,14 @@ public class ChessClient {
     public String help() throws Exception {
         if (!loggedIn) {
             return "Use one of the following commands: register <username> <password> <email>  login <username> <password> quit";
-        } else {
-            return "Use one of the following commands: listGames  createGame  joinGame  logout  quit";
+        }
+        else {
+            if (!inGame) {
+                return "Use one of the following commands: listGames  createGame  joinGame  logout  quit";
+            }
+            else {
+                return "Use one of the following commands: redraw leave quit";
+            }
         }
     }
 }
