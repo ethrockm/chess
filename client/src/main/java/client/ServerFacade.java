@@ -2,8 +2,6 @@ package client;
 
 import model.AuthData;
 import model.GameData;
-import service.GameService;
-import service.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
 import com.google.gson.Gson;
+import service.GameService;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
@@ -21,6 +21,7 @@ public class ServerFacade {
         this.serverURL = "http://localhost:" + port;
     }
 
+
     public AuthData login(String username, String password) throws Exception {
         URL url = new URI(serverURL + "/session").toURL();
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -28,7 +29,7 @@ public class ServerFacade {
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
 
-        UserService.LoginRequest request = new UserService.LoginRequest(username, password);
+        LoginRequest request = new LoginRequest(username, password);
         String jsonBody = gson.toJson(request);
         try (OutputStream os = http.getOutputStream()){
             os.write(jsonBody.getBytes());
@@ -49,7 +50,7 @@ public class ServerFacade {
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/json");
 
-        UserService.RegisterRequest request = new UserService.RegisterRequest(username, password, email);
+        RegisterRequest request = new RegisterRequest(username, password, email);
         String jsonBody = gson.toJson(request);
         try (OutputStream os = http.getOutputStream()){
             os.write(jsonBody.getBytes());
@@ -83,7 +84,7 @@ public class ServerFacade {
         http.setRequestProperty("Content-Type", "application/json");
         http.setRequestProperty("Authorization", authToken);
 
-        GameService.CreateGameRequest request = new GameService.CreateGameRequest(gameName);
+        CreateGameRequest request = new CreateGameRequest(gameName);
         String jsonBody = gson.toJson(request);
         try (OutputStream os = http.getOutputStream()){
             os.write(jsonBody.getBytes());
@@ -93,12 +94,12 @@ public class ServerFacade {
             throw new Exception("Could not create game");
         }
         try (InputStream is = http.getInputStream()){
-            GameService.CreateGameResult result = gson.fromJson(new InputStreamReader(is), GameService.CreateGameResult.class);
+            CreateGameResult result = gson.fromJson(new InputStreamReader(is), CreateGameResult.class);
             return result.gameID();
         }
     }
 
-    public Collection<GameService.GameInfo> listGame(String authToken) throws Exception {
+    public Collection<GameInfo> listGame(String authToken) throws Exception {
         URL url = new URI(serverURL + "/game").toURL();
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestMethod("GET");
@@ -109,7 +110,7 @@ public class ServerFacade {
             throw new Exception("Could not list games");
         }
         try (InputStream is = http.getInputStream()){
-            GameService.ListGameResult result = gson.fromJson(new InputStreamReader(is), GameService.ListGameResult.class);
+            ListGameResult result = gson.fromJson(new InputStreamReader(is), ListGameResult.class);
             return result.games();
         }
     }
@@ -122,7 +123,7 @@ public class ServerFacade {
         http.setRequestProperty("Content-Type", "application/json");
         http.setRequestProperty("Authorization", authToken);
 
-        GameService.JoinGameRequest request = new GameService.JoinGameRequest(playerColor,gameID);
+        JoinGameRequest request = new JoinGameRequest(playerColor,gameID);
         String jsonBody = gson.toJson(request);
         try (OutputStream os = http.getOutputStream()){
             os.write(jsonBody.getBytes());
