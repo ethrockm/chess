@@ -4,4 +4,4 @@ import service.GameService;
 
 import java.util.Collection;
 
-public record ListGameResult(Collection<GameService.GameInfo> games){}
+public record ListGameResult(Collection<GameInfo> games){}

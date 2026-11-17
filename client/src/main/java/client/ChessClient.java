@@ -2,11 +2,9 @@ package client;
 
 import chess.ChessGame;
 import model.AuthData;
-import service.GameService;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Locale;
 
 public class ChessClient {
 
@@ -94,7 +92,7 @@ public class ChessClient {
             return "Expected: listgames\n";
         }
         try {
-            Collection<GameService.GameInfo> games = serverFacade.listGame(authToken);
+            Collection<GameInfo> games = serverFacade.listGame(authToken);
             if (games.isEmpty()){
                 return "No games are available.\n";
             }
@@ -105,7 +103,7 @@ public class ChessClient {
         }
     }
 
-    private static StringBuilder createBuilt(Collection<GameService.GameInfo> games) {
+    private static StringBuilder createBuilt(Collection<GameInfo> games) {
         StringBuilder built = new StringBuilder();
         built.append("---- Current Games ----\n");
         int id = 1;
