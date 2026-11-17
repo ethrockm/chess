@@ -205,7 +205,7 @@ public class ChessClient {
         }
         else {
             if (!inGame) {
-                return "Use one of the following commands: listGames  createGame  joinGame  logout  quit";
+                return "Use one of the following commands: listgames  creategame  joingame  logout  quit";
             }
             else {
                 return "Use one of the following commands: redraw leave quit";

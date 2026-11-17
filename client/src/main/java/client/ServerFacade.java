@@ -35,7 +35,7 @@ public class ServerFacade {
         }
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("Credentials not found");
         }
         try (InputStream is = http.getInputStream()){
             return gson.fromJson(new InputStreamReader(is), AuthData.class);
@@ -56,7 +56,7 @@ public class ServerFacade {
         }
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("User already taken");
         }
         try (InputStream is = http.getInputStream()){
             return gson.fromJson(new InputStreamReader(is), AuthData.class);
@@ -71,7 +71,7 @@ public class ServerFacade {
         http.connect();
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("Missing Authorization");
         }
     }
 
@@ -90,7 +90,7 @@ public class ServerFacade {
         }
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("Could not create game");
         }
         try (InputStream is = http.getInputStream()){
             GameService.CreateGameResult result = gson.fromJson(new InputStreamReader(is), GameService.CreateGameResult.class);
@@ -106,7 +106,7 @@ public class ServerFacade {
         http.connect();
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("Could not list games");
         }
         try (InputStream is = http.getInputStream()){
             GameService.ListGameResult result = gson.fromJson(new InputStreamReader(is), GameService.ListGameResult.class);
@@ -129,7 +129,7 @@ public class ServerFacade {
         }
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("Cannot join this game with this player color");
         }
     }
 
@@ -140,7 +140,7 @@ public class ServerFacade {
         http.connect();
 
         if (http.getResponseCode() != 200){
-            throw new Exception("Server error code: " + http.getResponseCode());
+            throw new Exception("Cannot clear");
         }
     }
 }

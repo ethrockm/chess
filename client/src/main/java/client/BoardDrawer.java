@@ -7,7 +7,6 @@ public class BoardDrawer {
     private static final String RESET = "\u001b[0m";
     private static final String SET_BG_LIGHT = "\u001b[47m"; // White/Light background
     private static final String SET_BG_DARK = "\u001b[100m";  // Dark background
-    private static final String SET_TEXT_BLACK = "\u001b[30m";
     private static final String SET_TEXT_RED = "\u001b[31m";   // White pieces
     private static final String SET_TEXT_BLUE = "\u001b[34m";  // Black pieces
 
@@ -24,7 +23,7 @@ public class BoardDrawer {
 
         sb.append("   ");
         for (int c = startCol; c != endCol; c+= colStep){
-            sb.append(" ").append((char) ('a' + c -1)).append(" ");
+            sb.append(" ").append((char) ('a' + c -1)).append(" ").append(RESET);
         }
         sb.append("\n");
 
@@ -42,14 +41,16 @@ public class BoardDrawer {
         }
         sb.append("   ");
         for (int c = startCol; c != endCol; c += colStep){
-            sb.append(" ").append((char) ('a' + c - 1)).append(" ");
+            sb.append(" ").append((char) ('a' + c - 1)).append(" ").append(RESET);
         }
         sb.append("\n");
         return sb.toString();
     }
 
     private static String getPieceCharacter(chess.ChessPiece piece){
-        if(piece == null) return "\u2003";
+        if(piece == null) {
+            return " ";
+        }
 
         boolean isWhite = (piece.getTeamColor() == ChessGame.TeamColor.WHITE);
         String colorCode = isWhite ? SET_TEXT_RED : SET_TEXT_BLUE;
@@ -62,7 +63,7 @@ public class BoardDrawer {
             case QUEEN -> "Q";
             case KING -> "K";
         };
-        return colorCode + symbol + RESET;
+        return colorCode + symbol;
     }
 
 }
