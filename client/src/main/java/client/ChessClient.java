@@ -123,7 +123,12 @@ public class ChessClient {
         }
 
         String playerColor = params[0].toUpperCase();
-        int gameID = Integer.parseInt(params[1]);
+        int gameID;
+        try {
+            gameID = Integer.parseInt(params[1]);
+        } catch (NumberFormatException e) {
+            return "Input formatted incorrectly";
+        }
 
         try {
             if (!playerColor.equals("OBSERVER")){
